@@ -2,8 +2,43 @@ const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const User = require("../models/userModel");
 const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/appError");
 const axios = require("axios");
 const Course = require("../models/courseModel");
+
+// Base URL of the Python NLP service. Override with NLP_URL in the env
+// (see config.env) when it does not run on the default port.
+const NLP_URL = process.env.NLP_URL || "http://localhost:3001";
+
+// The Gemini free tier is rate limited, and the NLP service surfaces a 429
+// as a 500. Translate it into a message the UI can actually show.
+const callNLP = async (path, body) => {
+  try {
+    return await axios.post(`${NLP_URL}${path}`, body);
+  } catch (err) {
+    const status = err?.response?.status;
+    if (status === 500) {
+      throw new AppError(
+        503,
+        "The AI service is rate limited right now. Please wait a minute and try again."
+      );
+    }
+    if (status === 429) {
+      throw new AppError(
+        429,
+        "The AI service is rate limited right now. Please wait a minute and try again."
+      );
+    }
+    if (!err?.response) {
+      throw new AppError(
+        503,
+        "Could not reach the AI service. Is the NLP service running?"
+      );
+    }
+    throw err;
+  }
+};
+
 const signJWT = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPRIES_IN,
@@ -73,10 +108,7 @@ exports.generateQuestions = catchAsync(async (req, res, next) => {
   const { topic } = req.body;
   console.log(topic);
 
-  const response = await axios.post(
-    "http://localhost:3001/generate-questions",
-    { topic: topic }
-  );
+  const response = await callNLP("/generate-questions", { topic: topic });
 
   const advanced = response.data.questions.advanced;
   const basic = response.data.questions.basic;
@@ -92,7 +124,7 @@ exports.generateQuestions = catchAsync(async (req, res, next) => {
 exports.generateModule = catchAsync(async (req, res, next) => {
   const { questions, answers, topic } = req.body;
 
-  const response = await axios.post("http://localhost:3001/generate-module", {
+  const response = await callNLP("/generate-module", {
     topic,
     questions,
     answers,
@@ -125,9 +157,7 @@ exports.generateModule = catchAsync(async (req, res, next) => {
 
 exports.getNotes = catchAsync(async (req, res) => {
   const { topic } = req.body;
-  const response = await axios.post("http://127.0.0.1:3001/get-notes", {
-    topic,
-  });
+  const response = await callNLP("/get-notes", { topic });
   console.log(response.data);
 
   res.status(200).json({

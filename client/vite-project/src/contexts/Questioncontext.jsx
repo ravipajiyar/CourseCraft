@@ -1,12 +1,48 @@
-import React, { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
-// Create the context
-export const QuestionsContext = createContext();
+const QuestionsContext = createContext();
+
+const STORAGE_KEY = 'cc:questions';
+
+const readStored = () => {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (!raw) return { questions: undefined, topic: '' };
+    const parsed = JSON.parse(raw);
+    return {
+      questions: Array.isArray(parsed.questions) ? parsed.questions : undefined,
+      topic: parsed.topic || '',
+    };
+  } catch {
+    return { questions: undefined, topic: '' };
+  }
+};
 
 // Provide the context to the rest of the app
 export const QuestionsProvider = ({ children }) => {
-  const [questions, setQuestions] = useState(undefined); // State to store questions
-  const [topic, setTopic] = useState(''); // State to store questions
+  const [{ questions, topic }, setState] = useState(readStored);
+
+  const setQuestions = (value) =>
+    setState((prev) => {
+      const next = { ...prev, questions: value };
+      persist(next);
+      return next;
+    });
+
+  const setTopic = (value) =>
+    setState((prev) => {
+      const next = { ...prev, topic: value };
+      persist(next);
+      return next;
+    });
+
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === STORAGE_KEY) setState(readStored());
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
 
   return (
     <QuestionsContext.Provider
@@ -16,6 +52,14 @@ export const QuestionsProvider = ({ children }) => {
     </QuestionsContext.Provider>
   );
 };
+
+function persist(state) {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // Storage unavailable — the assessment still works for this session.
+  }
+}
 
 export const useQuestions = function () {
   const state = useContext(QuestionsContext);

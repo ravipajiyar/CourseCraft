@@ -1,4 +1,3 @@
-import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import LandingPage from './pages/landingPage';
 import CoursePage from './pages/CoursePage';
@@ -10,14 +9,17 @@ import { QuestionsProvider } from './contexts/Questioncontext';
 import { CourseProvider } from './contexts/courseContext';
 import AboutPage from './pages/About';
 import FeaturesPage from './pages/Features';
+import NotFoundPage from './pages/NotFound';
+import ScrollToTop from './components/ui/ScrollToTop';
 
 function App() {
   return (
-    <div className=" bg-black  h-screen text-white">
+    <div className="relative min-h-screen bg-ink-950 text-chalk">
       <UserProvider>
         <QuestionsProvider>
           <CourseProvider>
             <BrowserRouter>
+              <ScrollToTop />
               <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/about" element={<AboutPage />} />
@@ -26,6 +28,7 @@ function App() {
                 <Route path="/genchat" element={<GenChatPage />} />
                 <Route path="/courselist" element={<ViewCoursesPage />} />
                 <Route path="/coursecontent" element={<CourseContent />} />
+                <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </BrowserRouter>
           </CourseProvider>

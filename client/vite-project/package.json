@@ -7,25 +7,27 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "format": "prettier --write ./src",
+    "mock:api": "node scripts/mock-api.mjs",
+    "verify:ui": "node scripts/verify-ui.mjs",
+    "verify:flow": "node scripts/verify-flow.mjs",
+    "verify:flow2": "node scripts/verify-flow2.mjs",
+    "verify:accordion": "node scripts/verify-accordion.mjs",
+    "audit:tap": "node scripts/audit-tap-targets.mjs",
+    "probe": "node scripts/probe-ui.mjs",
+    "audit:design": "node scripts/audit-design.mjs",
+    "screenshot": "node scripts/screenshot-all.mjs"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^6.7.2",
-    "@fortawesome/fontawesome-svg-core": "^6.7.2",
-    "@fortawesome/free-solid-svg-icons": "^6.7.2",
-    "@fortawesome/react-fontawesome": "^0.2.2",
     "axios": "^1.7.7",
-    "daisyui": "^5.0.0",
+    "marked": "^14.1.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.3.0",
-    "react-loader-spinner": "^6.1.6",
     "react-router": "^6.26.2",
-    "react-router-dom": "^6.26.2",
-    "react-scroll-to-bottom": "^4.2.0",
-    "socket.io-client": "^4.7.5"
+    "react-router-dom": "^6.26.2"
   },
-  "format": "prettier --write ./src",
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@vitejs/plugin-react": "^4.3.1",

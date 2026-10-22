@@ -1,24 +1,21 @@
-import os
-import google.generativeai as genai
 import json
+
 from dotenv import load_dotenv
+
+from gemini_client import chat
 
 load_dotenv()
 
-genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
 # Create the model
 generation_config = {
-  "temperature": 1,
-  "top_p": 0.95,
-  "top_k": 64,
-  "max_output_tokens": 8192,
-  "response_mime_type": "text/plain",
+    "temperature": 1,
+    "top_p": 0.95,
+    "top_k": 64,
+    "max_output_tokens": 8192,
+    "response_mime_type": "text/plain",
 }
 
-model = genai.GenerativeModel(
-  model_name="gemini-1.5-flash",
-  generation_config=generation_config,
-  system_instruction="""
+system_instruction = """
   Task: Generate a diverse set of questions (2 for each levels) that assess the user's knowledge of a given topic. The questions should cover different difficulty levels (basic, intermediate, and advanced) and focus on various subtopics or key concepts related to the provided topic.
 
 Instruction:
@@ -50,20 +47,15 @@ Formatting: Return the questions in the following format:
       "advanced": ["<question 1>", "<question 2>", ...]
    }
 }
-  """
-  # safety_settings = Adjust safety settings
-  # See https://ai.google.dev/gemini-api/docs/safety-settings
-)
+"""
 
-chat_session = model.start_chat(
-  history=[
-  ]
-)
 
 def generate_questions_gemini(topic):
-    response = chat_session.send_message(topic).text
+    response = chat(
+        topic,
+        generation_config=generation_config,
+        system_instruction=system_instruction,
+    )
     start_index = response.find("{")
     end_index = response.rfind("}") + 1
-    formatted_json_response = json.loads(response[start_index:end_index])
-    return formatted_json_response
-
+    return json.loads(response[start_index:end_index])

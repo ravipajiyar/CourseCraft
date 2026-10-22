@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon --ext js,json --watch ./ --env-file config.env server.js",
     "startt": "NODE_ENV=production nodemon --env-file config.env server.js",
-    "start": "cross-env NODE_ENV=develooment nodemon --env-file config.env server.js"
+    "start": "cross-env NODE_ENV=develooment nodemon --env-file config.env server.js",
+    "mongo:dev": "node scripts/dev-mongo.mjs"
   },
   "author": "",
   "license": "ISC",
@@ -25,6 +26,7 @@
     "validator": "^13.12.0"
   },
   "devDependencies": {
+    "mongodb-memory-server": "^11.3.0",
     "nodemon": "^3.1.5"
   }
 }
