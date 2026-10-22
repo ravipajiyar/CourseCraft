@@ -12,9 +12,8 @@ import {
 } from 'react-icons/fa6';
 import { useCourse } from '../contexts/courseContext';
 import { useNavigate } from 'react-router';
-import axios from 'axios';
 import { marked } from 'marked';
-import { API_ROUTES } from '../config/api';
+import { API_ROUTES, apiPost } from '../config/api';
 
 /* ------------------------------------------------------------------- Notes */
 const Notes = ({ topic, setSelectedTopic }) => {
@@ -28,7 +27,7 @@ const Notes = ({ topic, setSelectedTopic }) => {
       try {
         setLoading(true);
         setError('');
-        const response = await axios.post(
+        const response = await apiPost(
           API_ROUTES.getNotes,
           { topic }
         );

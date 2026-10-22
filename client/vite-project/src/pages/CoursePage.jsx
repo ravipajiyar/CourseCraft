@@ -16,10 +16,9 @@ import {
   FaCircleNotch,
 } from 'react-icons/fa6';
 import { useCourse } from '../contexts/courseContext';
-import axios from 'axios';
 import { marked } from 'marked';
 import { useNavigate } from 'react-router';
-import { API_ROUTES } from '../config/api';
+import { API_ROUTES, apiPost } from '../config/api';
 
 /* ------------------------------------------------------------------ Module */
 const CourseModule = ({ module, index, setSelectedTopic }) => {
@@ -177,7 +176,7 @@ const Notes = ({ topic, setSelectedTopic }) => {
       try {
         setLoading(true);
         setError('');
-        const response = await axios.post(
+        const response = await apiPost(
           API_ROUTES.getNotes,
           { topic }
         );

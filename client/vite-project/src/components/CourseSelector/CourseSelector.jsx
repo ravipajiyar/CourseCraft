@@ -1,9 +1,8 @@
-import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaMagnifyingGlass, FaArrowRight, FaWandMagicSparkles } from 'react-icons/fa6';
 import { useQuestions } from '../../contexts/Questioncontext';
-import { API_ROUTES } from '../../config/api';
+import { API_ROUTES, apiPost } from '../../config/api';
 import AiLoader from '../ui/AiLoader';
 
 const suggestions = [
@@ -31,7 +30,7 @@ export default function CourseSelector() {
     setLoading(true);
 
     try {
-      const response = await axios.post(
+      const response = await apiPost(
         API_ROUTES.generateQuestions,
         { topic }
       );

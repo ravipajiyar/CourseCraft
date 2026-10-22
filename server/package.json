@@ -5,15 +5,14 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --ext js,json --watch ./ --env-file config.env server.js",
-    "startt": "NODE_ENV=production nodemon --env-file config.env server.js",
-    "start": "cross-env NODE_ENV=develooment nodemon --env-file config.env server.js",
+    "start": "node server.js",
+    "start:local": "cross-env NODE_ENV=development nodemon --env-file config.env server.js",
     "mongo:dev": "node scripts/dev-mongo.mjs"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.7.7",
-    "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",

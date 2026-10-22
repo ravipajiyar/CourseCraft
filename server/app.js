@@ -12,6 +12,11 @@ app.use("/public", express.static("public"));
 
 app.use("/api/user", userRouter);
 
+// Health check used by Render to decide when the service is live.
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok", service: "coursecraft-api" });
+});
+
 app.get("*", (req, res) => {
   res.status(404).json({
     status: "fail",

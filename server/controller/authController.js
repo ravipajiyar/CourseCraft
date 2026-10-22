@@ -8,13 +8,23 @@ const Course = require("../models/courseModel");
 
 // Base URL of the Python NLP service. Override with NLP_URL in the env
 // (see config.env) when it does not run on the default port.
-const NLP_URL = process.env.NLP_URL || "http://localhost:3001";
+//
+// Resolved per call rather than at module load, so a value that arrives
+// after this file was required is still picked up.
+const nlpUrl = () => process.env.NLP_URL || "http://127.0.0.1:3001";
 
 // The Gemini free tier is rate limited, and the NLP service surfaces a 429
 // as a 500. Translate it into a message the UI can actually show.
+//
+// The timeout stays below the 100s request limit of the free hosts, so the
+// API answers with a readable error instead of being cut off by the proxy.
+const NLP_TIMEOUT_MS = 95000;
+
 const callNLP = async (path, body) => {
   try {
-    return await axios.post(`${NLP_URL}${path}`, body);
+    return await axios.post(`${nlpUrl()}${path}`, body, {
+      timeout: NLP_TIMEOUT_MS,
+    });
   } catch (err) {
     const status = err?.response?.status;
     if (status === 500) {
@@ -27,6 +37,12 @@ const callNLP = async (path, body) => {
       throw new AppError(
         429,
         "The AI service is rate limited right now. Please wait a minute and try again."
+      );
+    }
+    if (err?.code === "ECONNABORTED") {
+      throw new AppError(
+        504,
+        "The AI service took too long to answer. Please try again."
       );
     }
     if (!err?.response) {

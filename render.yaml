@@ -1,19 +1,51 @@
+# Render Blueprint for CourseCraft.
+#
+# Deploy with:  render blueprint launch  (or "New > Blueprint" in the
+# dashboard and point it at this repository).
+#
+# The frontend is NOT here — it is deployed to Vercel (free). This blueprint
+# runs the API and the NLP service together in a single container, because
+# Render's free tier allows 750 service-hours per month in total and two
+# always-on services would need ~1440.
+#
+# After the first deploy, set the two values marked "sync: false" in the
+# Render dashboard (Environment tab) — they have no sensible default:
+#   DATABASE      -> mongodb+srv://... (MongoDB Atlas free M0 cluster)
+#   GOOGLE_API_KEY -> a Gemini API key
+
 services:
   - type: web
-    name: backend-service
-    env: node
-    buildCommand: cd server && npm install
-    startCommand: cd server && npm start
-  - type: web
-    name: nlp-service
-    env: python3
-    # api.py is the Flask app that exposes /generate-questions,
-    # /generate-module and /get-notes. main.py is only a scratch script.
-    buildCommand: cd NLP && pip install -r requirements.txt
-    startCommand: cd NLP && python api.py
-  - type: static
-    name: frontend-service
-    # VITE_API_URL is read at BUILD time by Vite — set it in the static
-    # site's environment to the deployed backend service URL.
-    buildCommand: cd vite-project && npm install && npm run build
-    publishDir: vite-project/dist
+    name: coursecraft-api
+    runtime: node
+    plan: free
+    region: oregon
+    branch: main
+    autoDeploy: true
+    # The API exposes /health, which Render polls to decide the service is live.
+    healthCheckPath: /health
+    buildCommand: |
+      cd server && npm install --omit=dev && cd .. \
+      && cd NLP && python3 -m pip install --no-cache-dir -r requirements.txt
+    startCommand: ./server/scripts/start-production.sh
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # The NLP service runs inside this same container on localhost.
+      - key: NLP_URL
+        value: http://127.0.0.1:3001
+      - key: NLP_PORT
+        value: "3001"
+      - key: GEMINI_MODEL
+        value: gemini-3.8-flash
+      - key: JWT_EXPRIES_IN
+        value: 10d
+      - key: JWT_COOKIE_EXPIRES_IN
+        value: "30"
+      # Render generates a random secret on first deploy.
+      - key: JWT_SECRET
+        generateValue: true
+      # Set these in the dashboard.
+      - key: DATABASE
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
