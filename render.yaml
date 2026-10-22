@@ -7,9 +7,13 @@ services:
   - type: web
     name: nlp-service
     env: python3
+    # api.py is the Flask app that exposes /generate-questions,
+    # /generate-module and /get-notes. main.py is only a scratch script.
     buildCommand: cd NLP && pip install -r requirements.txt
-    startCommand: cd NLP && python main.py
+    startCommand: cd NLP && python api.py
   - type: static
     name: frontend-service
+    # VITE_API_URL is read at BUILD time by Vite — set it in the static
+    # site's environment to the deployed backend service URL.
     buildCommand: cd vite-project && npm install && npm run build
     publishDir: vite-project/dist

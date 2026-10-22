@@ -3,4 +3,11 @@
 /server/node_modules/
 /server/public/
 /server/config.env
+/.logs/
+/server/.mongo-data/
+/client/vite-project/.env
+/client/vite-project/.env.local
+/client/vite-project/.env.*.local
 **/.DS_Store
+__pycache__/
+*.pyc

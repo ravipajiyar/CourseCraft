@@ -28,11 +28,20 @@ export default [
       ...react.configs.recommended.rules,
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
+      // The app is plain JSX and does not use PropTypes anywhere.
+      'react/prop-types': 'off',
       'react/jsx-no-target-blank': 'off',
       'react-refresh/only-export-components': [
         'warn',
-        { allowConstantExport: true },
+        {
+          allowConstantExport: true,
+          allowExportNames: ['useUser', 'useCourse', 'useQuestions'],
+        },
       ],
     },
+  },
+  {
+    files: ['tailwind.config.js', 'postcss.config.js', 'vite.config.js'],
+    languageOptions: { globals: globals.node },
   },
 ]

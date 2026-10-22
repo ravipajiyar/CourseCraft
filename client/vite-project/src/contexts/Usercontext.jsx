@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-
 import axios from 'axios';
+import { API_ROUTES } from '../config/api';
 
 const UserContext = createContext();
 
@@ -11,19 +11,39 @@ function UserProvider({ children }) {
 
   const login = (user) => {
     setUser(user);
+    setError('');
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
   };
 
   async function getUser() {
     const token = localStorage.getItem('token');
-    console.log(token);
-    const res = await axios.get(
-      `http://127.0.0.1:3000/api/v2/user/token/${token}`
-    );
-    setUser(res.data.user);
+    if (!token) return;
+
+    setIsLoading(true);
+    try {
+      const res = await axios.get(API_ROUTES.userByToken(token));
+      setUser(res.data?.data?.user ?? res.data?.user ?? null);
+    } catch {
+      // A stale or invalid token should not break the app — drop it.
+      localStorage.removeItem('token');
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
+  useEffect(() => {
+    getUser();
+  }, []);
+
   return (
-    <UserContext.Provider value={{ user, isLoading, error, login, getUser }}>
+    <UserContext.Provider
+      value={{ user, isLoading, error, login, logout, getUser }}
+    >
       {children}
     </UserContext.Provider>
   );

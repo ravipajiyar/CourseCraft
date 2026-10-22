@@ -1,10 +1,14 @@
 from flask import Flask, request, jsonify
-from question_generator import generate_questions
+from dotenv import load_dotenv
 from question_generator_gemini import generate_questions_gemini
 from expected_answer_generator import generate_expected_answers
 from generate_module import generate_module
 from get_notes_on import get_notes_on
 import json
+import os
+
+# Load NLP/.env no matter which directory the service is started from.
+load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env'))
 
 app = Flask(__name__)
 
@@ -44,6 +48,8 @@ def get_notes():
 
 
 if __name__ == '__main__':
-    app.run(port=3001, debug=True)
+    import os
+    port = int(os.getenv('NLP_PORT', '3001'))
+    app.run(port=port, debug=True)
 
 # test this
