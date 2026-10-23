@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import axios from 'axios';
-import { API_ROUTES } from '../config/api';
+import { API_ROUTES, apiGet } from '../config/api';
 
 const UserContext = createContext();
 
@@ -25,7 +24,7 @@ function UserProvider({ children }) {
 
     setIsLoading(true);
     try {
-      const res = await axios.get(API_ROUTES.userByToken(token));
+      const res = await apiGet(API_ROUTES.userByToken(token));
       setUser(res.data?.data?.user ?? res.data?.user ?? null);
     } catch {
       // A stale or invalid token should not break the app — drop it.

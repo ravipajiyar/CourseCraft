@@ -17,7 +17,8 @@
     "audit:tap": "node scripts/audit-tap-targets.mjs",
     "probe": "node scripts/probe-ui.mjs",
     "audit:design": "node scripts/audit-design.mjs",
-    "screenshot": "node scripts/screenshot-all.mjs"
+    "screenshot": "node scripts/screenshot-all.mjs",
+    "verify:live": "node scripts/verify-live.mjs"
   },
   "dependencies": {
     "axios": "^1.7.7",

@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useQuestions } from '../../contexts/Questioncontext';
 import { useCourse } from '../../contexts/courseContext';
 import { useNavigate } from 'react-router';
-import axios from 'axios';
 import {
   FaArrowLeft,
   FaArrowRight,
@@ -13,7 +12,7 @@ import {
   FaBrain,
 } from 'react-icons/fa6';
 import AiLoader from '../ui/AiLoader';
-import { API_ROUTES } from '../../config/api';
+import { API_ROUTES, apiPost } from '../../config/api';
 
 const TIERS = [
   { key: 'basic', label: 'Basic', range: [0, 2], accent: 'mint' },
@@ -72,7 +71,7 @@ const ChatAI = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.post(
+      const response = await apiPost(
         API_ROUTES.generateModule,
         { questions: qsn, answers: userAnswers, topic }
       );

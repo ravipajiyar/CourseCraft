@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { FaEye, FaEyeSlash, FaXmark, FaArrowRight, FaLock } from 'react-icons/fa6';
 import { useUser } from '../../contexts/Usercontext';
-import { API_ROUTES } from '../../config/api';
+import { API_ROUTES, apiPost } from '../../config/api';
 
 export default function Login({ close, onLogin }) {
   const [email, setEmail] = useState('');
@@ -18,7 +17,7 @@ export default function Login({ close, onLogin }) {
     setLoading(true);
 
     try {
-      const response = await axios.post(
+      const response = await apiPost(
         API_ROUTES.login,
         { email, password }
       );

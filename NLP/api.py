@@ -12,6 +12,10 @@ load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env'))
 
 app = Flask(__name__)
 
+@app.route('/health', methods=['GET'])
+def health():
+    return jsonify({'status': 'ok', 'service': 'coursecraft-nlp'})
+
 @app.route('/generate-questions', methods=['POST'])
 def get_generated_questions():
 
@@ -49,7 +53,11 @@ def get_notes():
 
 if __name__ == '__main__':
     import os
-    port = int(os.getenv('NLP_PORT', '3001'))
-    app.run(port=port, debug=True)
+    # Render (and most PaaS providers) inject PORT. NLP_PORT wins so the
+    # service can also run next to the API on a fixed internal port.
+    port = int(os.getenv('NLP_PORT') or os.getenv('PORT') or 3001)
+    # Bind to 0.0.0.0 — the default 127.0.0.1 is unreachable from outside
+    # the container.
+    app.run(host='0.0.0.0', port=port, debug=os.getenv('FLASK_DEBUG') == '1')
 
 # test this
