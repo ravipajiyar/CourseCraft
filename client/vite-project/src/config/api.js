@@ -31,7 +31,10 @@ export const API_TIMEOUT_MS = 120000;
  * slow request instead of an error.
  */
 const COLD_START_STATUSES = [502, 503];
-const COLD_START_RETRIES = 2;
+// Measured cold start on Render's free plan is 30-50s, so the budget has to
+// be longer than that. Retries are flat 5s apart rather than backing off, and
+// only happen while the host answers 502/503 almost instantly.
+const COLD_START_RETRIES = 12;
 const COLD_START_DELAY_MS = 5000;
 
 /**
@@ -68,7 +71,7 @@ const request = async (method, url, body, { retries = COLD_START_RETRIES } = {})
         throw error;
       }
 
-      const delay = COLD_START_DELAY_MS * (attempt + 1);
+      const delay = COLD_START_DELAY_MS;
       console.warn(
         `[api] ${status} from ${url} — retrying in ${delay / 1000}s (the host may be waking up)`
       );
