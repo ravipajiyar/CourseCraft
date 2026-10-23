@@ -33,6 +33,13 @@ MODEL_FALLBACKS = [
 _RETRYABLE = ('429', 'ResourceExhausted', '404', 'NotFound', 'not found',
               'no longer available', 'quota')
 
+# The SDK retries 429/5xx with exponential backoff for ~40s per model before
+# raising. On an exhausted free-tier key that meant two fallbacks burned ~80s
+# and a single note took 116s, so the API timed out at 95s. Disable the inner
+# retry: a 429 comes back immediately and the chain reaches a model that still
+# has quota in a fraction of the time.
+_REQUEST_OPTIONS = {'retry': None}
+
 
 def _is_retryable(err):
     text = str(err)
@@ -50,7 +57,9 @@ def generate(prompt, generation_config=None, system_instruction=None):
                 generation_config=generation_config,
                 system_instruction=system_instruction,
             )
-            return model.generate_content(prompt).text
+            return model.generate_content(
+                prompt, request_options=_REQUEST_OPTIONS
+            ).text
         except Exception as err:  # noqa: BLE001 - the SDK raises many types
             last_error = err
             print(f'[gemini] {name} failed: {str(err)[:200]}', flush=True)
@@ -72,7 +81,9 @@ def chat(prompt, generation_config=None, system_instruction=None):
                 system_instruction=system_instruction,
             )
             session = model.start_chat(history=[])
-            return session.send_message(prompt).text
+            return session.send_message(
+                prompt, request_options=_REQUEST_OPTIONS
+            ).text
         except Exception as err:  # noqa: BLE001 - the SDK raises many types
             last_error = err
             print(f'[gemini] {name} failed: {str(err)[:200]}', flush=True)
