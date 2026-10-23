@@ -1,11 +1,13 @@
 # Runtime dependencies for the NLP service.
 #
-# The previous list was a full `pip freeze` and dragged in pyarrow, together,
-# numpy and pillow — none of which are imported any more (the Together
-# import was the source of the broken question_generator.py module). Keeping
-# the list lean makes the Render build much faster and less likely to fail.
+# Fully pinned to the versions in the local virtualenv (NLP/venv, Python 3.13)
+# so the Render build resolves to exactly what was tested locally. Leaving the
+# transitive deps unpinned let pip pick much newer releases (e.g. pydantic
+# 2.14) against google-generativeai 0.8.4.
 #
-# Versions match the local virtualenv (NLP/venv).
+# Python is pinned to 3.13 via /.python-version: grpcio 1.70.0 and
+# MarkupSafe 3.0.2 publish no cp314 wheels, so on Python 3.14 pip tries to
+# compile them from source and the Render build fails.
 
 Flask==3.1.0
 Werkzeug==3.1.3
@@ -27,6 +29,22 @@ googleapis-common-protos==1.68.0
 grpcio==1.70.0
 grpcio-status==1.70.0
 protobuf==5.29.3
+
+# Transitive deps of the Google client libraries, pinned explicitly.
+pydantic==2.10.6
+pydantic_core==2.27.2
+annotated-types==0.7.0
+typing_extensions==4.12.2
+tqdm==4.67.1
+proto-plus==1.26.0
+uritemplate==4.1.1
+httplib2==0.22.0
+pyparsing==3.2.1
+packaging==26.3
+rsa==4.9
+pyasn1==0.6.1
+pyasn1_modules==0.4.1
+cachetools==5.5.2
 
 requests==2.32.3
 urllib3==2.3.0

@@ -30,6 +30,10 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      # grpcio/MarkupSafe have no cp314 wheels, so 3.14 cannot install the
+      # NLP deps without a source build. /.python-version also pins this.
+      - key: PYTHON_VERSION
+        value: 3.13.5
       # The NLP service runs inside this same container on localhost.
       - key: NLP_URL
         value: http://127.0.0.1:3001
